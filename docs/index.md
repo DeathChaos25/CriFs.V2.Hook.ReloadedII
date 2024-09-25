@@ -16,6 +16,7 @@ If you need to support an additional game, and it is not listed here; [consider 
 
 | Game                          | Build Date           | CRI FS Version | Compiler            | Notes                                                                                    | 
 |-------------------------------|----------------------|----------------|---------------------|------------------------------------------------------------------------------------------|
+| Binary Domain                 | Jan 31 2011 18:26:26 | 2.23.00        | MSC1500,MT          | Missing `SetPriority` function. Only has `BindFile`.                                     |
 | Yakuza 0                      | Jan  9 2015 13:02:51 | 2.66.07        | MSC16.00.40219.1,MT | ⚠️ Loads files by ID, which CriFsV2Hook does not support hooking. Missing `SetPriority`. |
 | Yakuza Kiwami                 | Oct  6 2015 19:45:41 | 2.71.02        | MSC17.00.61030.0,MT | ⚠️ Loads files by ID, which CriFsV2Hook does not support hooking. Missing `SetPriority`. |
 | One Piece: Burning Blood      | Oct  8 2015 13:15:23 | 2.70.00        | MSC16.00.40219.1,MT | Missing `SetPriority` function.                                                          |
@@ -34,6 +35,7 @@ If you need to support an additional game, and it is not listed here; [consider 
 | Persona 3 Portable            | May 12 2022 19:34:26 | 2.82.15        | MSC19.16.27045.0,MT |                                                                                          |
 | Persona 4 The Golden (64-bit) | May 12 2022 19:34:26 | 2.82.15        | MSC19.16.27045.0,MT |                                                                                          |
 | Judgment                      | Aug  5 2022 19:37:39 | 2.78.11        | MSC19.00.24210.0,MT | Only has `BindFile`.                                                                     |
+| Metaphor: ReFantazio          | Oct  2 2023 10:26:25 | 2.85.1         | MSC19.16.27048.0,MT |                                                                                          |
 
 ### x86 Games
 
