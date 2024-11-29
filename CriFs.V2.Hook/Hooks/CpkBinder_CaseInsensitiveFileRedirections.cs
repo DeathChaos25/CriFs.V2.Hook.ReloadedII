@@ -14,6 +14,7 @@ public static unsafe partial class CpkBinder
 {
     private static SpanOfCharDict<nint> NewToOriginalCasing = null!;
     private static readonly char[] CriSeparators = { ',', '\n', '\t' };
+    private static readonly Dictionary<string, string> _redirections = new(StringComparer.OrdinalIgnoreCase);
 
     // Note: Separators can be overwritten by game(s). I haven't seen a game which does it yet though, so not implemented.
     private static CRI.CRI.CriError BindFileImpl(nint bndrhn, nint srcbndrhn, byte* path, nint work, int worksize,
@@ -35,8 +36,12 @@ public static unsafe partial class CpkBinder
             return _bindFileHook!.OriginalFunction(bndrhn, srcbndrhn, path, work, worksize, bndrid);
 
         _logger.Debug("BindFile Replace {0} -> {1}", pathStr, newPath);
+
+        RemoveRedirection(pathStr);
+
         var tempStr = Marshal.StringToHGlobalAnsi(newPath);
         var result = _bindFileHook!.OriginalFunction(bndrhn, srcbndrhn, (byte*)tempStr, work, worksize, bndrid);
+
         Marshal.FreeHGlobal(tempStr);
         return result;
     }
@@ -60,6 +65,9 @@ public static unsafe partial class CpkBinder
             return _bindFilesHook!.OriginalFunction(bndrhn, srcbndrhn, path, work, worksize, bndrid);
 
         _logger.Debug("BindFiles Replace {0} -> {1}", pathStr, newPath);
+
+        RemoveRedirection(pathStr);
+
         var tempStr = Marshal.StringToHGlobalAnsi(newPath);
         var result = _bindFilesHook!.OriginalFunction(bndrhn, srcbndrhn, (byte*)tempStr, work, worksize, bndrid);
         Marshal.FreeHGlobal(tempStr);
@@ -265,5 +273,21 @@ public static unsafe partial class CpkBinder
 
         foreach (var val in NewToOriginalCasing.GetValues())
             Marshal.FreeHGlobal(val.Value);
+    }
+
+    public static void AddFileRedirection( string existing_path, string new_path )
+    {
+        _redirections[new_path] = existing_path;
+    }
+
+    private static bool TryFindRedirect(string gameFilePath, out string? newPath)
+    {
+        return _redirections.TryGetValue(gameFilePath, out newPath);
+    }
+
+    public static void RemoveRedirection(string path)
+    {
+        if (TryFindRedirect(path, out var gamepath))
+            _redirections.Remove(gamepath);
     }
 }

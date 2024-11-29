@@ -88,4 +88,6 @@ public class Api : ICriFsRedirectorApi
         _cpkFiles = results.ToArray();
         return _cpkFiles;
     }
+
+    public void AddFileRedirection(string existing_path, string new_path) => CpkBinder.AddFileRedirection(existing_path, new_path);
 }

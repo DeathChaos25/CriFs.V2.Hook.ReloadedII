@@ -109,5 +109,10 @@ public interface ICriFsRedirectorApi
         /// </summary>
         public string ModId;
     }
+
+    /// <summary>
+    /// Adds a file path to be redirected
+    /// </summary>
+    public void AddFileRedirection(string existing_path, string new_path);
 }
 
