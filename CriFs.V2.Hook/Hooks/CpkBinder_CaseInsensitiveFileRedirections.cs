@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using CriFs.V2.Hook.Utilities;
@@ -158,6 +159,16 @@ public static unsafe partial class CpkBinder
         if (Pointers.CriFsIo_IsUtf8 != (int*)0 && *Pointers.CriFsIo_IsUtf8 == 1)
         {
             var str = Marshal.PtrToStringUTF8((nint)stringPtr);
+
+            if (TryFindRedirect(str, out var gamepath))
+            {
+                var redirect_path = Marshal.StringToCoTaskMemUTF8(gamepath);
+                _logger.Debug($"path {str} redirected to {gamepath}");
+                var err_ret = _ioOpenHook!.OriginalFunction((byte*)redirect_path, fileCreationType, desiredAccess, result);
+                Marshal.FreeCoTaskMem(redirect_path);
+                return err_ret;
+            }
+
             if (!_content.TryGetValue(SanitizeCriPath(str!), out var value, out _))
                 return _ioOpenHook!.OriginalFunction(stringPtr, fileCreationType, desiredAccess, result);
 
@@ -275,19 +286,18 @@ public static unsafe partial class CpkBinder
             Marshal.FreeHGlobal(val.Value);
     }
 
-    public static void AddFileRedirection( string existing_path, string new_path )
+    public static void AddFileRedirection( string existing_path, string path_to_redirect )
     {
-        _redirections[new_path] = existing_path;
+        _redirections[path_to_redirect] = existing_path;
     }
 
-    private static bool TryFindRedirect(string gameFilePath, out string? newPath)
+    private static bool TryFindRedirect(string path_to_redirect, out string? existing_path)
     {
-        return _redirections.TryGetValue(gameFilePath, out newPath);
+        return _redirections.TryGetValue(path_to_redirect, out existing_path);
     }
 
-    public static void RemoveRedirection(string path)
+    public static void RemoveRedirection(string path_to_redirect)
     {
-        if (TryFindRedirect(path, out var gamepath))
-            _redirections.Remove(gamepath);
+        _redirections.Remove(path_to_redirect);
     }
 }
